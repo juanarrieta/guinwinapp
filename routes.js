@@ -11,7 +11,7 @@ routes.get('/getPaises', (req, res)=>{
     req.getConnection((err, conn)=>{
         if(err) return res.send(err);
 
-        conn.query('SELECT DISTINCT COD_PAIS, PAIS FROM UBICACION', (err, rows)=>{
+        conn.query('SELECT DISTINCT COD_PAIS, PAIS FROM ubicacion', (err, rows)=>{
             if(err) return res.send(err);
 
             res.json(rows)
