@@ -334,7 +334,7 @@ routes.get('/getMensajes/:idUsuario', (req, res)=>{
         if(err) return res.send(err);
         
         try{
-            let sel = 'SELECT '+
+            let sel = 'SELECT * FROM (SELECT '+
                     '   P.VENDEDOR AS idVendedor'+
                     '  ,U.NOMBRE AS vendedor'+
                     '  ,M.ID_COMPRADOR AS idComprador'+
@@ -364,7 +364,7 @@ routes.get('/getMensajes/:idUsuario', (req, res)=>{
                     ' INNER JOIN usuario U ON U.ID = P.VENDEDOR'+
                     ' WHERE (P.VENDEDOR = ? OR M.ID_COMPRADOR = ?)' +
                     ' AND M.ESTADO = 1'+
-                    ' GROUP BY idVendedor, idComprador, idPublicacion' +
+                    ' GROUP BY idVendedor, idComprador, idPublicacion) T' +
                     ' ORDER BY M.leido ASC';
 
             conn.query(sel, [req.params.idUsuario, req.params.idUsuario, req.params.idUsuario, req.params.idUsuario], (err, result)=>{
