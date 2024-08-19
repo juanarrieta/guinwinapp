@@ -24,7 +24,7 @@ routes.get('/getDepartamentos/:idPais', (req, res)=>{
     req.getConnection((err, conn)=>{
         if(err) return res.send(err);
 
-        conn.query('SELECT DISTINCT COD_DEPARTAMENTO, DEPARTAMENTO FROM UBICACION WHERE COD_PAIS = ?', [req.params.idPais], (err, rows)=>{
+        conn.query('SELECT DISTINCT COD_DEPARTAMENTO, DEPARTAMENTO FROM ubicacion WHERE COD_PAIS = ?', [req.params.idPais], (err, rows)=>{
             if(err) return res.send(err);
         
             res.json(rows);
@@ -37,7 +37,7 @@ routes.get('/getCiudades/:idDepartamento', (req, res)=>{
     req.getConnection((err, conn)=>{
         if(err) return res.send(err);
 
-        conn.query('SELECT DISTINCT COD_MUNICIPIO, MUNICIPIO FROM UBICACION WHERE COD_DEPARTAMENTO = ?', [req.params.idDepartamento], (err, rows)=>{
+        conn.query('SELECT DISTINCT COD_MUNICIPIO, MUNICIPIO FROM ubicacion WHERE COD_DEPARTAMENTO = ?', [req.params.idDepartamento], (err, rows)=>{
             if(err) return res.send(err);
 
             res.json(rows);
@@ -50,7 +50,7 @@ routes.get('/getPublicaciones/:departamento/:ciudad/:modulo/:precios/:palabraCla
     req.getConnection((err, conn)=>{
         if(err) return res.send(err);
 
-        let sel = 'SELECT * FROM PUBLICACION WHERE ESTADO = 1 AND VENDEDOR != COALESCE(' + req.params.idUsuario + ',"0")';
+        let sel = 'SELECT * FROM publicacion WHERE ESTADO = 1 AND VENDEDOR != COALESCE(' + req.params.idUsuario + ',"0")';
         let order = ' ORDER BY FECHA_PUBLICACION DESC';
 
         if(!(req.params.departamento === 'null' || req.params.departamento === '')){
@@ -125,8 +125,8 @@ routes.get('/getPublicacion/:idPublicacion', (req, res)=>{
                     '    ,C.MUNICIPIO AS CIUDAD'+
                     '    ,(SELECT NOMBRE FROM USUARIO WHERE ID = P.VENDEDOR) AS VENDEDOR '+
                     '    ,P.VENDEDOR AS IDVENDEDOR '+
-                    'FROM PUBLICACION P '+
-                    'INNER JOIN UBICACION C ON C.COD_MUNICIPIO = P.CIUDAD '+
+                    'FROM publicacion P '+
+                    'INNER JOIN ubicacion C ON C.COD_MUNICIPIO = P.CIUDAD '+
                     'WHERE P.ID = ?';
 
             conn.query(sel, [req.params.idPublicacion], (err, rows)=>{
@@ -148,7 +148,7 @@ routes.post('/registrarUsuario', (req, res)=>{
 
         const datos = req.body;
 
-        let sel = "INSERT INTO USUARIO (NOMBRE, CORREO, TELEFONO, DIRECCION, FECHA_NACIMIENTO, PAIS, DEPARTAMENTO, CIUDAD, CLAVE) VALUES ('"+datos.nombre+"','"+datos.correo+"',"+datos.telefono+",'"+datos.direccion+"','"+datos.fechaNac.slice(0, 10)+"',"+datos.pais+","+datos.departamento+","+datos.ciudad+",'"+datos.clave.trimStart()+"')";
+        let sel = "INSERT INTO usuario (NOMBRE, CORREO, TELEFONO, DIRECCION, FECHA_NACIMIENTO, PAIS, DEPARTAMENTO, CIUDAD, CLAVE) VALUES ('"+datos.nombre+"','"+datos.correo+"',"+datos.telefono+",'"+datos.direccion+"','"+datos.fechaNac.slice(0, 10)+"',"+datos.pais+","+datos.departamento+","+datos.ciudad+",'"+datos.clave.trimStart()+"')";
 
         try{
             conn.query(sel, (err, resp)=>{
@@ -175,7 +175,7 @@ routes.post('/login', (req, res)=>{
 
         const datos = req.body;
 
-        let sel = "SELECT COUNT(*) AS CANT FROM USUARIO WHERE CORREO = ?";
+        let sel = "SELECT COUNT(*) AS CANT FROM usuario WHERE CORREO = ?";
 
         try{
             conn.query(sel, [datos.correo], (err, rows)=>{
@@ -185,7 +185,7 @@ routes.post('/login', (req, res)=>{
                     res.json({ mensaje: "El correo ingresado no fue encontrado, porfavor registrese primero." });
                 }
                 else{
-                    let sel = "SELECT ID, NOMBRE FROM USUARIO WHERE CORREO = ? AND CLAVE = ?";
+                    let sel = "SELECT ID, NOMBRE FROM usuario WHERE CORREO = ? AND CLAVE = ?";
 
                     try{
                         conn.query(sel, [datos.correo, datos.pwd], (err, rows)=>{
@@ -219,7 +219,7 @@ routes.get('/getDepartamentoUsu/:correo', (req, res)=>{
         try{
             let sel = 'SELECT'+ 
             '     DEPARTAMENTO '+
-            'FROM USUARIO '+
+            'FROM usuario '+
             'WHERE CORREO = ?';
 
             conn.query(sel, [req.params.correo], (err, rows)=>{
@@ -274,7 +274,7 @@ routes.post('/publicar', (req, res)=>{
                             fotos = fotos + '/';
                     }
 
-                    let sel = "UPDATE PUBLICACION SET FOTOS = ?, FOTO_PRI = ? WHERE ID = ?";
+                    let sel = "UPDATE publicacion SET FOTOS = ?, FOTO_PRI = ? WHERE ID = ?";
 
                     conn.query(sel, [fotos, id[0].ID + '-1.jpg', id[0].ID], (err, resp)=>{
                         if(err) return res.json("Error: Ocurrio un error al realizar el registro porfavor contacte con el administrador del sistema.");
@@ -299,7 +299,7 @@ routes.get('/validarCuentaPublicacion/:idUsuario', (req, res)=>{
         try{
             let sel = 'SELECT'+ 
             '     COUNT(*) AS CANT_PUBLICACIONES '+
-            'FROM PUBLICACION '+
+            'FROM publicacion '+
             'WHERE VENDEDOR = ?';
 
             conn.query(sel, [req.params.idUsuario], (err, cantidad)=>{
@@ -307,8 +307,8 @@ routes.get('/validarCuentaPublicacion/:idUsuario', (req, res)=>{
 
                 let sel = 'SELECT'+ 
                 '     TC.CANT_PUBLICACIONES '+
-                'FROM TIPO_CUENTA TC '+
-                'INNER JOIN USUARIO U ON U.TIPO_CUENTA = TC.ID '+
+                'FROM tipo_cuenta TC '+
+                'INNER JOIN usuario U ON U.TIPO_CUENTA = TC.ID '+
                 'WHERE U.ID = ?';
 
                 conn.query(sel, [req.params.idUsuario], (err, limite)=>{
@@ -359,9 +359,9 @@ routes.get('/getMensajes/:idUsuario', (req, res)=>{
                     '           0 '+ 
                     '        END  '+ 
                     '   END as usrEnvio'+
-                    ' FROM MENSAJE M'+
-                    ' INNER JOIN PUBLICACION P ON P.ID = M.ID_PUBLICACION'+
-                    ' INNER JOIN USUARIO U ON U.ID = P.VENDEDOR'+
+                    ' FROM mensaje M'+
+                    ' INNER JOIN publicacion P ON P.ID = M.ID_PUBLICACION'+
+                    ' INNER JOIN usuario U ON U.ID = P.VENDEDOR'+
                     ' WHERE (P.VENDEDOR = ? OR M.ID_COMPRADOR = ?)' +
                     ' AND M.ESTADO = 1'+
                     ' GROUP BY idVendedor, idComprador, idPublicacion' +
@@ -391,9 +391,9 @@ routes.get('/getMensajesPublicacion/:idPublicacion/:idVenderdor/:idComprador', (
                       '   ,M.ID_COMPRADOR AS IDCOMPRADOR '+
                       '   ,M.MENSAJE_COMPRADOR '+
                       '   ,M.MENSAJE_VENDEDOR '+
-                      ' FROM PUBLICACION P '+
-                      ' INNER JOIN MENSAJE M ON M.ID_PUBLICACION = P.ID '+
-                      ' INNER JOIN USUARIO U ON U.ID = P.VENDEDOR '+
+                      ' FROM publicacion P '+
+                      ' INNER JOIN mensaje M ON M.ID_PUBLICACION = P.ID '+
+                      ' INNER JOIN usuario U ON U.ID = P.VENDEDOR '+
                       ' WHERE P.ID = ? '+
                       ' AND M.ID_COMPRADOR = ? '+   
                       ' AND M.ESTADO = 1'+                
@@ -424,8 +424,8 @@ routes.get('/setLeido/:idPublicacion/:idComprador/:idUsuario', (req, res)=>{
                       '      ELSE '+
                       '          P.VENDEDOR '+
                       '      END AS ID_USUARIO '+
-                      '  FROM MENSAJE M '+
-                      '  INNER JOIN PUBLICACION P ON P.ID = M.ID_PUBLICACION '+
+                      '  FROM mensaje M '+
+                      '  INNER JOIN publicacion P ON P.ID = M.ID_PUBLICACION '+
                       '  WHERE M.ID_COMPRADOR = ? '+
                       '  AND M.ID_PUBLICACION = ? '+
                       '  ORDER BY M.ID DESC '+
@@ -459,7 +459,7 @@ routes.get('/eliminarChatBD/:idComprador/:idPublicacion', (req, res)=>{
         if(err) return res.send(err);
 
         try{    
-            let sel = 'UPDATE MENSAJE SET ESTADO = 0 WHERE ID_PUBLICACION = ? AND ID_COMPRADOR = ?';
+            let sel = 'UPDATE mensaje SET ESTADO = 0 WHERE ID_PUBLICACION = ? AND ID_COMPRADOR = ?';
 
             conn.query(sel, [req.params.idPublicacion, req.params.idComprador], (err, result)=>{
                 if(err) return res.send(err);     
@@ -524,8 +524,8 @@ routes.get('/validarEnvio/:idVendedor/:idComprador/:comprador', (req, res)=>{
             let msnEnvTotal = '';
             
             let sel = 'SELECT CANT_MENSAJES AS MSN_ENV_TOTAL '+
-                    'FROM TIPO_CUENTA C '+
-                    'INNER JOIN USUARIO U ON U.TIPO_CUENTA = C.ID '+
+                    'FROM tipo_cuenta C '+
+                    'INNER JOIN usuario U ON U.TIPO_CUENTA = C.ID '+
                     'WHERE U.ID = ?';
 
             conn.query(sel, [emisor], (err, ress)=>{
@@ -537,8 +537,8 @@ routes.get('/validarEnvio/:idVendedor/:idComprador/:comprador', (req, res)=>{
                 let totMsnRecib = '';
                 
                 sel = 'SELECT CAN_MSN_REC AS TOT_MSN_RECIB '+
-                    'FROM TIPO_CUENTA C '+
-                    'INNER JOIN USUARIO U ON U.TIPO_CUENTA = C.ID '+
+                    'FROM tipo_cuenta C '+
+                    'INNER JOIN usuario U ON U.TIPO_CUENTA = C.ID '+
                     'WHERE U.ID = ?';
 
                 conn.query(sel, [receptor], (err, ress)=>{
@@ -550,8 +550,8 @@ routes.get('/validarEnvio/:idVendedor/:idComprador/:comprador', (req, res)=>{
                     let msnEnviados = '';
                     
                     sel = 'SELECT COUNT(*) AS MSN_ENVIADOS '+
-                        'FROM MENSAJE M '+
-                        'INNER JOIN PUBLICACION P ON P.ID = M.ID_PUBLICACION '+
+                        'FROM mensaje M '+
+                        'INNER JOIN publicacion P ON P.ID = M.ID_PUBLICACION '+
                         'WHERE ID_COMPRADOR = ? '+
                         'AND VENDEDOR = ? '+
                         queryAnd;
@@ -577,7 +577,7 @@ routes.get('/getMisPublicaciones/:idVendedor', (req, res)=>{
         if(err) return res.send(err);
 
         let sel = ' SELECT * ' +
-                  ' FROM PUBLICACION ' +
+                  ' FROM publicacion ' +
                   ' WHERE ESTADO = 1 ' +
                   ' AND VENDEDOR = ? ' +
                   ' ORDER BY FECHA_PUBLICACION DESC';
@@ -596,12 +596,12 @@ routes.get('/eliminarPublicacionBD/:idPublicacion', (req, res)=>{
         if(err) return res.send(err);
 
         try{    
-            let sel = 'UPDATE MENSAJE SET ESTADO = 0 WHERE ID_PUBLICACION = ?';
+            let sel = 'UPDATE mensaje SET ESTADO = 0 WHERE ID_PUBLICACION = ?';
 
             conn.query(sel, [req.params.idPublicacion], (err, result)=>{
                 if(err) return res.send(err);    
                 
-                let sel = 'UPDATE PUBLICACION SET ESTADO = 0 WHERE ID = ?';
+                let sel = 'UPDATE publicacion SET ESTADO = 0 WHERE ID = ?';
 
                 conn.query(sel, [req.params.idPublicacion], (err, result)=>{
                     if(err) return res.send(err);      
@@ -623,21 +623,21 @@ routes.post('/guardarHistorial', (req, res)=>{
 
         const datos = req.body;
 
-        let sel = "select count(*) as cant from historial_busqueda where id_publicacion = ? and id_comprador = ?";
+        let sel = "SELECT count(*) as cant FROM historial_busqueda WHERE id_publicacion = ? and id_comprador = ?";
 
         try{
             conn.query(sel, [datos.idPublicacion, datos.idComprador], (err, rows)=>{
                 if(err) return res.send(err);
 
                 if(rows[0].cant == 0){
-                    let sel = "insert into historial_busqueda (id_publicacion, id_comprador, fecha_consulta) values (?,?,CURRENT_DATE())";
+                    let sel = "INSERT INTO historial_busqueda (id_publicacion, id_comprador, fecha_consulta) VALUES (?,?,CURRENT_DATE())";
 
                     conn.query(sel, [datos.idPublicacion, datos.idComprador], (err, rows)=>{
                         if(err) return res.send(err);        
                     })  
                 }
                 else{
-                    let sel = "update historial_busqueda set fecha_consulta = CURRENT_DATE() where id_publicacion = ? and id_comprador = ?";
+                    let sel = "UPDATE historial_busqueda SET fecha_consulta = CURRENT_DATE() WHERE id_publicacion = ? AND id_comprador = ?";
 
                     conn.query(sel, [datos.idPublicacion, datos.idComprador], (err, rows)=>{
                         if(err) return res.send(err);        
@@ -658,11 +658,11 @@ routes.get('/getHistorialBusqueda/:idComprador', (req, res)=>{
 
         let cant = 0;
 
-        let sel = ' select ' +
+        let sel = ' SELECT ' +
                   '   tc.cant_historial as cant ' +
-                  ' from tipo_cuenta tc ' +
-                  ' inner join usuario u on u.tipo_cuenta = tc.id ' +
-                  ' where u.id = ?';
+                  ' FROM tipo_cuenta tc ' +
+                  ' INNER JOIN usuario u ON u.tipo_cuenta = tc.id ' +
+                  ' WHERE u.id = ?';
       
         conn.query(sel, [req.params.idComprador], (err, rows)=>{  
             if(err) return res.send(err);
@@ -670,8 +670,8 @@ routes.get('/getHistorialBusqueda/:idComprador', (req, res)=>{
             cant = rows[0].cant;
 
             let sel = ' SELECT P.* ' +
-                  ' FROM PUBLICACION P' +
-                  ' INNER JOIN HISTORIAL_BUSQUEDA HB ON HB.ID_PUBLICACION = P.ID' +
+                  ' FROM publicacion P' +
+                  ' INNER JOIN historial_busqueda HB ON HB.ID_PUBLICACION = P.ID' +
                   ' WHERE P.ESTADO = 1 ' +
                   ' AND HB.ID_COMPRADOR = ? ' +
                   ' ORDER BY HB.FECHA_CONSULTA DESC LIMIT ' + cant;
@@ -691,7 +691,7 @@ routes.get('/eliminarDelHistorialBD/:idPublicacion/:idComprador', (req, res)=>{
         if(err) return res.send(err);
 
         try{         
-            let sel = 'DELETE FROM HISTORIAL_BUSQUEDA WHERE ID_PUBLICACION = ? AND ID_COMPRADOR = ?';
+            let sel = 'DELETE FROM historial_busqueda WHERE ID_PUBLICACION = ? AND ID_COMPRADOR = ?';
 
             conn.query(sel, [req.params.idPublicacion,req.params.idComprador], (err, result)=>{
                 if(err) return res.send(err);      
