@@ -16,7 +16,7 @@ const dboptions ={
     ,port: 3306
     ,user: 'root'
     ,password: ''
-    ,database: 'GUINWIN'
+    ,database: 'guinwin'
 }
  
 // middlewares -------------------------------------------
