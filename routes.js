@@ -123,7 +123,7 @@ routes.get('/getPublicacion/:idPublicacion', (req, res)=>{
                     '    ,P.FOTOS'+
                     '    ,P.FOTO_PRI'+
                     '    ,C.MUNICIPIO AS CIUDAD'+
-                    '    ,(SELECT NOMBRE FROM USUARIO WHERE ID = P.VENDEDOR) AS VENDEDOR '+
+                    '    ,(SELECT NOMBRE FROM usuario WHERE ID = P.VENDEDOR) AS VENDEDOR '+
                     '    ,P.VENDEDOR AS IDVENDEDOR '+
                     'FROM publicacion P '+
                     'INNER JOIN ubicacion C ON C.COD_MUNICIPIO = P.CIUDAD '+
@@ -338,15 +338,15 @@ routes.get('/getMensajes/:idUsuario', (req, res)=>{
                     '   P.VENDEDOR AS idVendedor'+
                     '  ,U.NOMBRE AS vendedor'+
                     '  ,M.ID_COMPRADOR AS idComprador'+
-                    '  ,(SELECT NOMBRE FROM USUARIO WHERE ID = M.ID_COMPRADOR) AS comprador'+
-                    '  ,CASE WHEN (SELECT MENSAJE_COMPRADOR FROM MENSAJE WHERE ID = MAX(M.ID)) = "" THEN '+            
-                    '     (SELECT MENSAJE_VENDEDOR FROM MENSAJE WHERE ID = MAX(M.ID)) '+
+                    '  ,(SELECT NOMBRE FROM usuario WHERE ID = M.ID_COMPRADOR) AS comprador'+
+                    '  ,CASE WHEN (SELECT MENSAJE_COMPRADOR FROM mensaje WHERE ID = MAX(M.ID)) = "" THEN '+            
+                    '     (SELECT MENSAJE_VENDEDOR FROM mensaje WHERE ID = MAX(M.ID)) '+
                     '   ELSE '+
-                    '     (SELECT MENSAJE_COMPRADOR FROM MENSAJE WHERE ID = MAX(M.ID)) '+
+                    '     (SELECT MENSAJE_COMPRADOR FROM mensaje WHERE ID = MAX(M.ID)) '+
                     '   END ultMensaje '+
-                    '  ,(SELECT leido FROM MENSAJE WHERE ID = MAX(M.ID)) as leido'+
+                    '  ,(SELECT leido FROM mensaje WHERE ID = MAX(M.ID)) as leido'+
                     '  ,P.ID as idPublicacion'+
-                    '  ,CASE WHEN (SELECT MENSAJE_COMPRADOR FROM MENSAJE WHERE ID = MAX(M.ID)) = "" THEN '+   
+                    '  ,CASE WHEN (SELECT MENSAJE_COMPRADOR FROM mensaje WHERE ID = MAX(M.ID)) = "" THEN '+   
                     '        CASE WHEN P.VENDEDOR = ? THEN '+  
                     '           1 '+ 
                     '        ELSE '+ 
@@ -387,7 +387,7 @@ routes.get('/getMensajesPublicacion/:idPublicacion/:idVenderdor/:idComprador', (
         try{
             let sel = ' SELECT '+
                       '    U.NOMBRE AS VENDEDOR '+
-                      '   ,(SELECT NOMBRE FROM USUARIO WHERE ID = M.ID_COMPRADOR) AS COMPRADOR '+
+                      '   ,(SELECT NOMBRE FROM usuario WHERE ID = M.ID_COMPRADOR) AS COMPRADOR '+
                       '   ,M.ID_COMPRADOR AS IDCOMPRADOR '+
                       '   ,M.MENSAJE_COMPRADOR '+
                       '   ,M.MENSAJE_VENDEDOR '+
