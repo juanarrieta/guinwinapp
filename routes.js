@@ -365,7 +365,7 @@ routes.get('/getMensajes/:idUsuario', (req, res)=>{
                     ' WHERE (P.VENDEDOR = ? OR M.ID_COMPRADOR = ?)' +
                     ' AND M.ESTADO = 1'+
                     ' GROUP BY idVendedor, idComprador, idPublicacion) T' +
-                    ' ORDER BY M.leido ASC';
+                    ' ORDER BY leido ASC';
 
             conn.query(sel, [req.params.idUsuario, req.params.idUsuario, req.params.idUsuario, req.params.idUsuario], (err, result)=>{
                 if(err) return res.send(err);   
