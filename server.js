@@ -12,7 +12,7 @@ require('dotenv').config();
 app.set('port', process.env.PORT || 9500)
 
 const dboptions ={
-     host: 'localhost'
+     host: '127.0.0.1'
     ,port: 3306
     ,user: 'root'
     ,password: ''
