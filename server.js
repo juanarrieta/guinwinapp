@@ -35,7 +35,7 @@ app.get('/', (req, res)=>{
 
 app.use(cors()); 
 app.use('/api', routes)
-
+/*
 const privateKey = fs.readFileSync('private-key.pem', 'utf8');
 const certificate = fs.readFileSync('certificate.pem', 'utf8');
 const credentials = {
@@ -43,8 +43,8 @@ const credentials = {
     cert: certificate,
     passphrase: '1234' // Agrega la contraseña aquí
 };
-const httpsServer = https.createServer(credentials, app);
-//const httpsServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);*/
+const httpsServer = http.createServer(app);
 
 // sever running -----------------------------------------
 httpsServer.listen(process.env.PORT , ()=>{
