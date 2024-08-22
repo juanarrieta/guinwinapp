@@ -286,7 +286,7 @@ routes.post('/publicar', (req, res)=>{
             })
         }
         catch(error) {
-            res.json("Error: Ocurrio un error al realizar el registro porfavor contacte con el administrador del sistema.");
+            res.json("Error: "+error);
         }
     })
 })
