@@ -723,7 +723,7 @@ routes.post('/upload', upload.single('image'), (req, res) => {
   }
 
   // Puedes guardar el archivo con el nuevo nombre aquí
-   fs.writeFileSync('../GWA_FrontEnd/src/assets/images/' + nuevoNombre, file.buffer);
+   fs.writeFileSync('../guinwinapp_front/src/assets/images/' + nuevoNombre, file.buffer);
 
    return res.status(200).json({ msg: 'Imagen cargada con éxito'});
 });
