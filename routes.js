@@ -237,7 +237,7 @@ routes.get('/getDepartamentoUsu/:correo', (req, res)=>{
 //REGISTRAR UNA PUBLICACION
 routes.post('/publicar', (req, res)=>{
     req.getConnection((err, conn)=>{
-        if(err) return res.send("Error: Ocurrio un error al realizar el registro porfavor contacte con el administrador del sistema.");
+        if(err) return res.send("Error: "+err);
 
         const datos = req.body;
 
@@ -245,7 +245,7 @@ routes.post('/publicar', (req, res)=>{
 
         try{
             conn.query(sel, (err, resp)=>{
-                if(err) return res.json("Error: Ocurrio un error al realizar el registro porfavor contacte con el administrador del sistema.");
+                if(err) return res.json("Error: "+err);
                 
                 //BUSCA EL ID DE LA PUBLICACION RECIEN REGISTRADA              
                 let sel = "  SELECT "+
@@ -261,7 +261,7 @@ routes.post('/publicar', (req, res)=>{
                             "AND vendedor = ?";
                
                 conn.query(sel, [datos.nombre, datos.precio, datos.descripcion, datos.ciudad, datos.modulo, datos.departamento, datos.vendedor], (err, id)=>{
-                    if(err) return res.json("Error: Ocurrio un error al realizar el registro porfavor contacte con el administrador del sistema.");
+                    if(err) return res.json("Error: "+err);
                         
                     //ACTUALIZAR LOS CAMPOS foto_pri Y fotos CON LOS NUEVOS NOMBRES DE LAS FOTOS QUE SON ID + CONSECUTIVO
                     const partes = datos.fotos.split('/');
@@ -277,7 +277,7 @@ routes.post('/publicar', (req, res)=>{
                     let sel = "UPDATE publicacion SET FOTOS = ?, FOTO_PRI = ? WHERE ID = ?";
 
                     conn.query(sel, [fotos, id[0].ID + '-1.jpg', id[0].ID], (err, resp)=>{
-                        if(err) return res.json("Error: Ocurrio un error al realizar el registro porfavor contacte con el administrador del sistema.");
+                        if(err) return res.json("Error: "+error);
                 
                         //RETORNAR EL CAMPO fotos CON LOS NUEVOS NOMBRES 
                         res.json(fotos);
