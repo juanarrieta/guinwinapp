@@ -241,7 +241,7 @@ routes.post('/publicar', (req, res)=>{
 
         const datos = req.body;
 
-        let sel = "INSERT INTO publicacion (nombre, precio, descripcion, ciudad, modulo, fotos, foto_pri, fecha_publicacion, estado, departamento, vendedor) VALUES ('"+datos.nombre+"','"+datos.precio+"','"+datos.descripcion+"',"+datos.ciudad+","+datos.modulo+",'"+datos.fotos+"','"+datos.foto_pri+"',sysdate(),1,"+datos.departamento+",'"+datos.vendedor+"')";
+        let sel = "INSERT INTO publicacion (nombre, precio, descripcion, ciudad, modulo, fotos, foto_pri, fecha_publicacion, estado, departamento, vendedor) VALUES ('"+datos.nombre+"','"+datos.precio+"','"+datos.descripcion+"',"+datos.ciudad+","+datos.modulo+",'"+datos.fotos+"','"+datos.foto_pri+"',SUBSTRING(sysdate(),1,10),1,"+datos.departamento+",'"+datos.vendedor+"')";
 
         try{
             conn.query(sel, (err, resp)=>{
